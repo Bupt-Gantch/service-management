@@ -1,0 +1,9 @@
+server:
+    port: 8000
+
+spring:
+  datasource:
+     url: jdbc:mysql://118.190.202.148:3306/BUPT_IOT?useUnicode=true&characterEncoding=utf8
+     username: root
+     password: Gantch815
+     driver-class-name: com.mysql.jdbc.Driver
