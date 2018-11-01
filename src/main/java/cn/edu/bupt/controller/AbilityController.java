@@ -3,13 +3,16 @@ package cn.edu.bupt.controller;
 import cn.edu.bupt.common.model.Ability;
 import cn.edu.bupt.common.util.AbilityValidator;
 import cn.edu.bupt.service.AbilityService;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +25,51 @@ public class AbilityController extends BaseController{
     @Autowired
     AbilityService abilityService;
     JsonParser parser = new JsonParser();
+
+    @RequestMapping(value = "/ability/device-type-id/{deviceTypeId}", method = RequestMethod.GET)
+    public  String findAllAbilityDesByDeviceTypeId(@PathVariable int deviceTypeId){
+        log.info("AbilityController.findAbilitiesDesByDeviceId receive a request [{}]" ,deviceTypeId);
+        JsonArray res = new JsonArray();
+        for (Ability a : abilityService.findAllAbilityByDeviceTypeId(deviceTypeId)){
+            res.add(parser.parse(a.getAbilityDes()));
+        }
+        log.info("AbilityController.findAbilitiesDesByDeviceId return [{}] data", res.size());
+        return res.toString();
+    }
+    @RequestMapping(value = "/ability/device-type-name/{deviceTypeName}", method = RequestMethod.GET)
+    public String findAllAbilityDesByDeviceTypeName(@PathVariable String deviceTypeName){
+        log.info("AbilityController.findAbilitiesDesByDeviceName receive a request [{}]" ,deviceTypeName);
+        JsonArray res = new JsonArray();
+        for (Ability a : abilityService.findAllAbilityByDeviceTypeName(deviceTypeName)){
+            res.add(parser.parse(a.getAbilityDes()));
+        }
+        log.info("AbilityController.findAbilitiesDesByDeviceName return [{}] data", res.size());
+        return res.toString();
+    }
+
+    @RequestMapping(value = "/ability/add-all-ability", method = RequestMethod.POST)
+    public List<Ability> saveAllAbility(@RequestBody String data){
+        log.info("AbilityController.saveAllAbility receive a request [{}]" ,data);
+        JsonObject objs = parser.parse(data).getAsJsonObject();
+        int modelId = objs.has("modelId") ?
+                objs.getAsJsonPrimitive("modelId").getAsInt() : -1;
+        List<Ability> res = new ArrayList<>();
+
+        JsonArray abilityDesArr = objs.getAsJsonArray("abilityDesArr");
+        if(modelId == -1 || abilityDesArr == null) return null;
+
+        for (JsonElement e : abilityDesArr){
+            String abilityDes = e.getAsJsonObject().toString();
+            if(!AbilityValidator.isValidateAbility(abilityDes)) continue;
+            Ability ability = new Ability();
+            ability.setModelId(modelId);
+            ability.setAbilityDes(abilityDes);
+            abilityService.addAbilityToAbilityGroup(ability);
+            res.add(ability);
+        }
+        log.info("AbilityController.saveAllAbility save [{}] data" ,abilityDesArr.size());
+        return res;
+    }
 
    @RequestMapping(value = "/ability",method = RequestMethod.POST)
    //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")

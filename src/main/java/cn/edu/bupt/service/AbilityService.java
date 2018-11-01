@@ -13,4 +13,6 @@ public interface AbilityService {
     public void deleteAbilityFromAbilityGroup(int abilityId);
     public List<Ability> findAbilitiesByModelId(int modelId);
     public List<Ability> findAbilitiesByThreeCouple(String mName, String dName, String model);
+    public List<Ability> findAllAbilityByDeviceTypeId(int deviceTypeId);
+    public List<Ability> findAllAbilityByDeviceTypeName(String deviceTypeName);
 }
