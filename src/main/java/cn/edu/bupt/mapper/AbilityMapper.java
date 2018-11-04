@@ -27,9 +27,7 @@ public interface AbilityMapper {
     @Delete("delete from ability where model_id = #{modelId}")
     void delete(int modelId);
 
-    @Select("select ability_id  as abilityId, " +
-            "ability.model_id as modelId, " +
-            "ability_des as abilityDes " +
+    @Select("select distinct ability_des as abilityDes " +
             "from ability, device_type, model " +
             "where device_type.device_type_id = #{deviceTypeId} " +
             "and device_type.device_type_id = model.device_type_id " +
